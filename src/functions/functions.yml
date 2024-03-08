@@ -1,0 +1,60 @@
+getOrders:
+  handler: src/functions/getOrders/getOrders.handler
+  environment:
+    ORDER_TABLE: !Ref OrderTable
+  iamRoleStatements:
+    - Effect: Allow
+      Action: dynamodb:Query
+      Resource: !Sub ${OrderTable.Arn}/index/byEmailAndCreatedDate
+getProducts:
+  handler: src/functions/getProducts/getProducts.handler
+  environment:
+    PRODUCT_TABLE: !Ref ProductTable
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Scan
+      Resource: !GetAtt ProductTable.Arn
+placeOrder:
+  handler: src/functions/placeOrder/placeOrder.handler
+  environment:
+    ORDER_TABLE: !Ref OrderTable
+    PRODUCT_TABLE: !Ref ProductTable
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:PutItem
+      Resource: !GetAtt OrderTable.Arn
+    - Effect: Allow
+      Action:
+        - dynamodb:GetItem
+      Resource: !GetAtt ProductTable.Arn
+createProduct:
+  handler: src/functions/createProduct/createProduct.handler
+  environment:
+    PRODUCT_TABLE: !Ref ProductTable
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:PutItem
+      Resource: !GetAtt ProductTable.Arn
+startProcessingOrder:
+  handler: src/functions/startProcessingOrder/startProcessingOrder.handler
+  environment:
+    PRODUCT_TABLE: !Ref OrderTable
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:GetItem
+        - dynamodb:UpdateItem
+      Resource: !GetAtt OrderTable.Arn
+completeOrder:
+  handler: src/functions/completeOrder/completeOrder.handler
+  environment:
+    PRODUCT_TABLE: !Ref OrderTable
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:GetItem
+        - dynamodb:UpdateItem
+      Resource: !GetAtt OrderTable.Arn
