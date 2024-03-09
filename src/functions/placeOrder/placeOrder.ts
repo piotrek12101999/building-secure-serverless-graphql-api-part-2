@@ -14,7 +14,6 @@ import { ProductRepository } from "../../database/types/ProductRepository";
 import { DynamoProductRepository } from "../../database/DynamoProductRepository/DynamoProductRepository";
 import { formatPrice } from "../../utils/formatPrice";
 import { getRequesterEmail } from "../../utils/getRequesterEmail";
-import { isAdmin } from "../../utils/isAdmin";
 
 const orderRepository: OrderRepository = new DynamoOrderRepository();
 const productRepository: ProductRepository = new DynamoProductRepository();

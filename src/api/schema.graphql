@@ -11,9 +11,12 @@ type Query {
 
 type Mutation {
     createProduct(input: ProductInput!): Product!
+	@aws_cognito_user_pools(cognito_groups: ["Admins"])
     placeOrder(input: OrderInput!): Order!
     startProcessingOrder(id: ID!): Order!
+	@aws_cognito_user_pools(cognito_groups: ["Admins"])
     completeOrder(id: ID!): Order!
+	@aws_cognito_user_pools(cognito_groups: ["Admins"])
 }
 
 type Product @aws_api_key @aws_cognito_user_pools {
@@ -52,7 +55,7 @@ input PriceInput {
 
 input ProductInput {
     name: String!
-    description: String
+    description: String!
     price: PriceInput!
 }
 

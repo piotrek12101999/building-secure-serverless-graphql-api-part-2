@@ -4,7 +4,7 @@ authentication:
   config:
     userPoolId: !Ref UserPool
 additionalAuthentications:
-  - type: "API_KEY"
+  - type: API_KEY
 apiKeys:
   - name: WebClientApiKey
     expiresAfter: 1M
