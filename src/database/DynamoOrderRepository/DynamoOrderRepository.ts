@@ -1,10 +1,10 @@
 import { Order, OrderStatus } from "../../generated/graphql";
 import { OrderRepository } from "../types/OrderRepository";
 import {
-  PutCommand,
   UpdateCommand,
   QueryCommand,
   GetCommand,
+  PutCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { DynamoRepository } from "../DynamoRepository/DynamoRepository";
 
@@ -34,6 +34,10 @@ export class DynamoOrderRepository
     });
 
     const { Item } = await this.docClient.send(command);
+
+    if (!Item) {
+      throw new Error("Not found error");
+    }
 
     return Item as Order;
   }

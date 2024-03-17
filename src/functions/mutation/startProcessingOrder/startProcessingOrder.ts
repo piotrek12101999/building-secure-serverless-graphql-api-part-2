@@ -3,9 +3,9 @@ import {
   Mutation,
   MutationStartProcessingOrderArgs,
   OrderStatus,
-} from "../../generated/graphql";
-import { OrderRepository } from "../../database/types/OrderRepository";
-import { DynamoOrderRepository } from "../../database/DynamoOrderRepository/DynamoOrderRepository";
+} from "../../../generated/graphql";
+import { OrderRepository } from "../../../database/types/OrderRepository";
+import { DynamoOrderRepository } from "../../../database/DynamoOrderRepository/DynamoOrderRepository";
 
 const orderRepository: OrderRepository = new DynamoOrderRepository();
 

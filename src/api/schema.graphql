@@ -6,17 +6,27 @@ schema {
 type Query {
     getProducts: [Product!]
     @aws_api_key @aws_cognito_user_pools
+    getCategories: [Category!]
+    @aws_api_key @aws_cognito_user_pools
     getOrders: [Order!]
 }
 
 type Mutation {
+    placeOrder(input: OrderInput!): Order!
     createProduct(input: ProductInput!): Product!
 	@aws_cognito_user_pools(cognito_groups: ["Admins"])
-    placeOrder(input: OrderInput!): Order!
+    createCategory(input: CategoryInput!): Category!
+    @aws_cognito_user_pools(cognito_groups: ["Admins"])
     startProcessingOrder(id: ID!): Order!
 	@aws_cognito_user_pools(cognito_groups: ["Admins"])
     completeOrder(id: ID!): Order!
 	@aws_cognito_user_pools(cognito_groups: ["Admins"])
+}
+
+type Category @aws_api_key @aws_cognito_user_pools  {
+    id: ID!
+    name: String!
+    products: [Product!]
 }
 
 type Product @aws_api_key @aws_cognito_user_pools {
@@ -25,6 +35,7 @@ type Product @aws_api_key @aws_cognito_user_pools {
     description: String
     price: String!
     created: AWSTimestamp!
+    categories: [Category!]
 }
 
 enum OrderStatus {
@@ -55,10 +66,16 @@ input PriceInput {
 
 input ProductInput {
     name: String!
-    description: String!
+    description: String
     price: PriceInput!
+    categories: [ID!]!
+}
+
+input CategoryInput {
+    name: String!
+    products: [ID!]!
 }
 
 input OrderInput {
-    productsIds: [ID!]!
+    products: [ID!]!
 }

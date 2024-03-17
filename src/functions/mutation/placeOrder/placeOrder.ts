@@ -6,14 +6,14 @@ import {
   Order,
   OrderStatus,
   Product,
-} from "../../generated/graphql";
-import { OrderRepository } from "../../database/types/OrderRepository";
-import { DynamoOrderRepository } from "../../database/DynamoOrderRepository/DynamoOrderRepository";
+} from "../../../generated/graphql";
+import { OrderRepository } from "../../../database/types/OrderRepository";
+import { DynamoOrderRepository } from "../../../database/DynamoOrderRepository/DynamoOrderRepository";
 import { v4 } from "uuid";
-import { ProductRepository } from "../../database/types/ProductRepository";
-import { DynamoProductRepository } from "../../database/DynamoProductRepository/DynamoProductRepository";
-import { formatPrice } from "../../utils/formatPrice";
-import { getRequesterEmail } from "../../utils/getRequesterEmail";
+import { ProductRepository } from "../../../database/types/ProductRepository";
+import { DynamoProductRepository } from "../../../database/DynamoProductRepository/DynamoProductRepository";
+import { formatPrice } from "../../../utils/formatPrice";
+import { getRequesterEmail } from "../../../utils/getRequesterEmail";
 
 const orderRepository: OrderRepository = new DynamoOrderRepository();
 const productRepository: ProductRepository = new DynamoProductRepository();
@@ -22,14 +22,15 @@ export const handler: AppSyncResolverHandler<
   MutationPlaceOrderArgs,
   Mutation["placeOrder"]
 > = async (event) => {
-  const productWriteModelsPromises = event.arguments.input.productsIds.map(
-    (id) => productRepository.findById(id)
+  const productWriteModelsPromises = event.arguments.input.products.map((id) =>
+    productRepository.findById(id)
   );
   const productWriteModels = await Promise.all(productWriteModelsPromises);
 
   const products: Product[] = productWriteModels.map(
     ({ price, ...product }) => ({
       ...product,
+      categories: [],
       price: formatPrice(price),
     })
   );

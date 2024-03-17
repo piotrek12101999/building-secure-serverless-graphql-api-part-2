@@ -1,48 +1,58 @@
-import { GetCommand, PutCommand, ScanCommand } from "@aws-sdk/lib-dynamodb";
-import { Product } from "../../generated/graphql";
-import { DynamoRepository } from "../DynamoRepository/DynamoRepository";
+import { GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import {
   ProductRepository,
   ProductWriteModel,
 } from "../types/ProductRepository";
+import { DynamoCategoryAndProductRepository } from "../DynamoCategoryAndProductRepository/DynamoCategoryAndProductRepository";
+import { CategoryWriteModel } from "../types/CategoryRepository";
+import { Category } from "../../generated/graphql";
 
 export class DynamoProductRepository
-  extends DynamoRepository
+  extends DynamoCategoryAndProductRepository<ProductWriteModel>
   implements ProductRepository
 {
   constructor() {
-    super("PRODUCT_TABLE");
+    super("PRODUCT");
   }
 
-  async create(product: ProductWriteModel): Promise<void> {
-    const command = new PutCommand({
-      TableName: this.tableName,
-      Item: product,
-    });
-
-    await this.docClient.send(command);
+  async appendCategory(
+    id: ProductWriteModel["id"],
+    categoryId: Category["id"]
+  ): Promise<void> {
+    return this.appendToEntity(id, categoryId, "categories");
   }
 
-  async findById(id: Product["id"]): Promise<ProductWriteModel> {
-    const command = new GetCommand({
+  async findCategoryProducts(categoryId: string): Promise<ProductWriteModel[]> {
+    const categoryCommand = new GetCommand({
       TableName: this.tableName,
       Key: {
-        id,
+        type: this.categoryType,
+        id: categoryId,
       },
     });
 
-    const { Item } = await this.docClient.send(command);
+    const { Item } = await this.docClient.send(categoryCommand);
 
-    return Item as ProductWriteModel;
-  }
+    if (!Item) {
+      throw new Error("Category not found");
+    }
 
-  async findAll(): Promise<ProductWriteModel[]> {
-    const command = new ScanCommand({
-      TableName: this.tableName,
-    });
+    const productsPromises = (Item as CategoryWriteModel).products.map(
+      async (id) => {
+        const command = new GetCommand({
+          TableName: this.tableName,
+          Key: {
+            type: this.productType,
+            id,
+          },
+        });
 
-    const { Items } = await this.docClient.send(command);
+        const { Item } = await this.docClient.send(command);
 
-    return (Items || []) as ProductWriteModel[];
+        return Item as ProductWriteModel;
+      }
+    );
+
+    return Promise.all(productsPromises);
   }
 }

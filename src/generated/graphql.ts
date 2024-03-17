@@ -24,6 +24,18 @@ export type Scalars = {
   Double: { input: any; output: any; }
 };
 
+export type Category = {
+  __typename?: 'Category';
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  products?: Maybe<Array<Product>>;
+};
+
+export type CategoryInput = {
+  name: Scalars['String']['input'];
+  products: Array<Scalars['ID']['input']>;
+};
+
 export enum Currency {
   Gbp = 'GBP',
   Usd = 'USD'
@@ -32,6 +44,7 @@ export enum Currency {
 export type Mutation = {
   __typename?: 'Mutation';
   completeOrder: Order;
+  createCategory: Category;
   createProduct: Product;
   placeOrder: Order;
   startProcessingOrder: Order;
@@ -40,6 +53,11 @@ export type Mutation = {
 
 export type MutationCompleteOrderArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationCreateCategoryArgs = {
+  input: CategoryInput;
 };
 
 
@@ -68,7 +86,7 @@ export type Order = {
 };
 
 export type OrderInput = {
-  productsIds: Array<Scalars['ID']['input']>;
+  products: Array<Scalars['ID']['input']>;
 };
 
 export enum OrderStatus {
@@ -84,6 +102,7 @@ export type PriceInput = {
 
 export type Product = {
   __typename?: 'Product';
+  categories?: Maybe<Array<Category>>;
   created: Scalars['AWSTimestamp']['output'];
   description?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
@@ -92,6 +111,7 @@ export type Product = {
 };
 
 export type ProductInput = {
+  categories: Array<Scalars['ID']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
   price: PriceInput;
@@ -99,6 +119,7 @@ export type ProductInput = {
 
 export type Query = {
   __typename?: 'Query';
+  getCategories?: Maybe<Array<Category>>;
   getOrders?: Maybe<Array<Order>>;
   getProducts?: Maybe<Array<Product>>;
 };
