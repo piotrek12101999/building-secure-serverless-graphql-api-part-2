@@ -1,45 +1,14 @@
 import { Order, OrderStatus } from "../../generated/graphql";
 import { OrderRepository } from "../types/OrderRepository";
-import {
-  UpdateCommand,
-  QueryCommand,
-  GetCommand,
-  PutCommand,
-} from "@aws-sdk/lib-dynamodb";
+import { UpdateCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { DynamoRepository } from "../DynamoRepository/DynamoRepository";
 
 export class DynamoOrderRepository
-  extends DynamoRepository
+  extends DynamoRepository<Order>
   implements OrderRepository
 {
   constructor() {
     super("ORDER_TABLE");
-  }
-
-  async create(order: Order): Promise<void> {
-    const command = new PutCommand({
-      TableName: this.tableName,
-      Item: order,
-    });
-
-    await this.docClient.send(command);
-  }
-
-  async findById(id: string): Promise<Order> {
-    const command = new GetCommand({
-      TableName: this.tableName,
-      Key: {
-        id,
-      },
-    });
-
-    const { Item } = await this.docClient.send(command);
-
-    if (!Item) {
-      throw new Error("Not found error");
-    }
-
-    return Item as Order;
   }
 
   async findAllByPurchaserEmail(

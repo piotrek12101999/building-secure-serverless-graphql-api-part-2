@@ -10,9 +10,8 @@ export const handler: AppSyncResolverHandler<
   {},
   Omit<Category["products"], "categories">
 > = async (event) => {
-  console.log(JSON.stringify(event), null, 3);
-  const products = await productRepository.findCategoryProducts(
-    event.source!.id
+  const products = await productRepository.findTransactionalByIds(
+    event.source!.products
   );
 
   return products.map(({ price, ...product }) => ({

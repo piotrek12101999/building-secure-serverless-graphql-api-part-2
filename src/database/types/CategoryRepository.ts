@@ -1,4 +1,5 @@
-import { Category, Product } from "../../generated/graphql";
+import { Category } from "../../generated/graphql";
+import { ProductWriteModel } from "./ProductRepository";
 
 export interface CategoryWriteModel extends Omit<Category, "products"> {
   products: string[];
@@ -6,9 +7,13 @@ export interface CategoryWriteModel extends Omit<Category, "products"> {
 
 export interface CategoryRepository {
   create(category: CategoryWriteModel): Promise<void>;
-  appendProduct(id: Category["id"], productId: Product["id"]): Promise<void>;
-  findProductCategories(
-    productId: Product["id"]
+  appendProduct(
+    id: CategoryWriteModel["id"],
+    productId: ProductWriteModel["id"]
+  ): Promise<void>;
+  findById(id: CategoryWriteModel["id"]): Promise<CategoryWriteModel>;
+  findTransactionalByIds(
+    ids: CategoryWriteModel["id"][]
   ): Promise<CategoryWriteModel[]>;
   findAll(): Promise<CategoryWriteModel[]>;
 }

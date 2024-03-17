@@ -1,12 +1,15 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import {
   DynamoDBDocumentClient,
+  GetCommand,
   PutCommand,
   ScanCommand,
+  TransactGetCommand,
+  UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { checkForEnv } from "../../utils/checkForEnv";
 
-export abstract class DynamoRepository {
+export abstract class DynamoRepository<T extends { id: string }> {
   private readonly client = new DynamoDBClient();
 
   protected readonly docClient = DynamoDBDocumentClient.from(this.client);
@@ -15,5 +18,81 @@ export abstract class DynamoRepository {
 
   constructor(tableName: string) {
     this.tableName = checkForEnv(process.env[tableName]);
+  }
+
+  async create(entity: T): Promise<void> {
+    const command = new PutCommand({
+      TableName: this.tableName,
+      Item: entity,
+    });
+
+    await this.docClient.send(command);
+  }
+
+  async findById(id: string): Promise<T> {
+    const command = new GetCommand({
+      TableName: this.tableName,
+      Key: {
+        id,
+      },
+    });
+
+    const { Item } = await this.docClient.send(command);
+
+    if (!Item) {
+      throw new Error("Not found");
+    }
+
+    return Item as T;
+  }
+
+  async findAll(): Promise<T[]> {
+    const command = new ScanCommand({
+      TableName: this.tableName,
+    });
+
+    const { Items } = await this.docClient.send(command);
+
+    return (Items || []) as T[];
+  }
+
+  async findTransactionalByIds(ids: T["id"][]): Promise<T[]> {
+    const command = new TransactGetCommand({
+      TransactItems: ids.map((id) => ({
+        Get: {
+          TableName: this.tableName,
+          Key: {
+            id,
+          },
+        },
+      })),
+    });
+
+    const { Responses } = await this.docClient.send(command);
+
+    if (!Responses) {
+      return [];
+    }
+
+    return Responses.map(({ Item }) => Item as T);
+  }
+
+  protected async appendToList(
+    id: T["id"],
+    entityToBeAppended: unknown,
+    propertyName: string
+  ) {
+    const command = new UpdateCommand({
+      TableName: this.tableName,
+      Key: {
+        id,
+      },
+      UpdateExpression: `SET ${propertyName} = list_append(${propertyName}, :entity)`,
+      ExpressionAttributeValues: {
+        ":entity": [entityToBeAppended],
+      },
+    });
+
+    await this.docClient.send(command);
   }
 }
