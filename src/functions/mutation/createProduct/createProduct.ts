@@ -21,6 +21,11 @@ export const handler: AppSyncResolverHandler<
   Mutation["createProduct"] | void
 > = async (event) => {
   const id = v4();
+  const { categories } = event.arguments.input;
+
+  if (categories.length > 0) {
+    await categoryRepository.findTransactionalByIds(categories);
+  }
 
   const productWriteModel: ProductWriteModel = {
     ...event.arguments.input,

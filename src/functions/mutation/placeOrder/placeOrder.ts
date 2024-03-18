@@ -1,5 +1,6 @@
 import { AppSyncResolverHandler } from "aws-lambda";
 import {
+  Category,
   Currency,
   Mutation,
   MutationPlaceOrderArgs,
@@ -22,17 +23,14 @@ export const handler: AppSyncResolverHandler<
   MutationPlaceOrderArgs,
   Mutation["placeOrder"]
 > = async (event) => {
-  const productWriteModelsPromises = event.arguments.input.products.map((id) =>
-    productRepository.findById(id)
-  );
-  const productWriteModels = await Promise.all(productWriteModelsPromises);
+  const { products: productsInput } = event.arguments.input;
 
-  const products: Product[] = productWriteModels.map(
-    ({ price, ...product }) => ({
-      ...product,
-      categories: [],
-      price: formatPrice(price),
-    })
+  if (productsInput.length === 0) {
+    throw new Error("Order must have at least one product assigned to it");
+  }
+
+  const productWriteModels = await productRepository.findTransactionalByIds(
+    productsInput
   );
 
   const summedAllCurrencies = productWriteModels.reduce<Record<string, number>>(
@@ -57,6 +55,15 @@ export const handler: AppSyncResolverHandler<
       })
     )
     .join(", ");
+
+  const products: Product[] = productWriteModels.map(
+    ({ price, categories, ...product }) => ({
+      ...product,
+      // Here we must assert type ourself as the categories property is later on picked up by category field resolver
+      categories: categories as unknown as Category[],
+      price: formatPrice(price),
+    })
+  );
 
   const order: Order = {
     id: v4(),

@@ -12,7 +12,7 @@ waf:
   enabled: true
   rules:
     - throttle
-queryDepthLimit: 10
+queryDepthLimit: 3
 introspection: false
 schema: src/api/schema.graphql
 resolvers:

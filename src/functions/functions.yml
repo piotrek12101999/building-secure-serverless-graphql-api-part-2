@@ -50,6 +50,7 @@ createProduct:
       Resource: !GetAtt ProductTable.Arn
     - Effect: Allow
       Action:
+        - dynamodb:GetItem
         - dynamodb:UpdateItem
       Resource: !GetAtt CategoryTable.Arn
 createCategory:
@@ -64,6 +65,7 @@ createCategory:
       Resource: !GetAtt CategoryTable.Arn
     - Effect: Allow
       Action:
+        - dynamodb:GetItem
         - dynamodb:UpdateItem
       Resource: !GetAtt ProductTable.Arn
 startProcessingOrder:

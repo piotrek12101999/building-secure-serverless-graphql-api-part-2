@@ -56,6 +56,10 @@ export abstract class DynamoRepository<T extends { id: string }> {
     return (Items || []) as T[];
   }
 
+  private arrayHasEmptyObject(arr: Record<string, unknown>[]) {
+    return arr.some((obj) => Object.keys(obj).length === 0);
+  }
+
   async findTransactionalByIds(ids: T["id"][]): Promise<T[]> {
     const command = new TransactGetCommand({
       TransactItems: ids.map((id) => ({
@@ -71,7 +75,11 @@ export abstract class DynamoRepository<T extends { id: string }> {
     const { Responses } = await this.docClient.send(command);
 
     if (!Responses) {
-      return [];
+      throw new Error("Error while fetching");
+    }
+
+    if (this.arrayHasEmptyObject(Responses)) {
+      throw new Error("Item not found");
     }
 
     return Responses.map(({ Item }) => Item as T);

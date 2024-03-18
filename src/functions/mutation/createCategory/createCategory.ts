@@ -20,7 +20,11 @@ export const handler: AppSyncResolverHandler<
   Omit<Mutation["createCategory"], "products">
 > = async (event) => {
   const id = v4();
-  const products = event.arguments.input.products;
+  const { products } = event.arguments.input;
+
+  if (products.length > 0) {
+    await productRepository.findTransactionalByIds(products);
+  }
 
   const category: CategoryWriteModel = {
     id: v4(),

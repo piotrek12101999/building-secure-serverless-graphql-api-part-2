@@ -9,5 +9,8 @@ export const handler: AppSyncResolverHandler<
   {},
   Omit<Product["categories"], "products">
 > = async (event) => {
+  if (event.source!.categories.length === 0) {
+    return [];
+  }
   return categoryRepository.findTransactionalByIds(event.source!.categories);
 };
