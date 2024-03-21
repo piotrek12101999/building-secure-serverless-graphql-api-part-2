@@ -15,6 +15,7 @@ waf:
 queryDepthLimit: 3
 introspection: false
 schema: src/api/schema.graphql
+xrayEnabled: true
 resolvers:
   Query.getOrders:
     kind: UNIT

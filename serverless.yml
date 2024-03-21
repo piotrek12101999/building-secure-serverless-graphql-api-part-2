@@ -18,6 +18,14 @@ custom:
 
 provider:
   name: aws
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - xray:PutTelemetryRecords
+            - xray:PutTraceSegments
+          Resource: "*"
   runtime: nodejs20.x
   architecture: arm64
   stage: ${self:custom.configFile.STAGE}

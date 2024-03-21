@@ -13,6 +13,8 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.515.0",
     "@aws-sdk/lib-dynamodb": "^3.515.0",
+    "aws-xray-sdk": "^3.5.4",
+    "joi": "^17.12.2",
     "typescript": "^5.3.3"
   },
   "devDependencies": {

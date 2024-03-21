@@ -7,10 +7,11 @@ import {
   TransactGetCommand,
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
+import AWSXRay from "aws-xray-sdk";
 import { checkForEnv } from "../../utils/checkForEnv";
 
 export abstract class DynamoRepository<T extends { id: string }> {
-  private readonly client = new DynamoDBClient();
+  private readonly client = AWSXRay.captureAWSv3Client(new DynamoDBClient());
 
   protected readonly docClient = DynamoDBDocumentClient.from(this.client);
 

@@ -11,6 +11,7 @@ import {
 import { v4 } from "uuid";
 import { ProductRepository } from "../../../database/types/ProductRepository";
 import { DynamoProductRepository } from "../../../database/DynamoProductRepository/DynamoProductRepository";
+import { schema } from "./schema";
 
 const categoryRepository: CategoryRepository = new DynamoCategoryRepository();
 const productRepository: ProductRepository = new DynamoProductRepository();
@@ -19,6 +20,12 @@ export const handler: AppSyncResolverHandler<
   MutationCreateCategoryArgs,
   Omit<Mutation["createCategory"], "products">
 > = async (event) => {
+  const { error } = schema.validate(event.arguments.input);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
   const id = v4();
   const { products } = event.arguments.input;
 

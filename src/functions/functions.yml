@@ -2,6 +2,7 @@ getOrders:
   handler: src/functions/query/getOrders/getOrders.handler
   environment:
     ORDER_TABLE: !Ref OrderTable
+  iamRoleStatementsInherit: true
   iamRoleStatements:
     - Effect: Allow
       Action: dynamodb:Query
@@ -10,6 +11,7 @@ getProducts:
   handler: src/functions/query/getProducts/getProducts.handler
   environment:
     PRODUCT_TABLE: !Ref ProductTable
+  iamRoleStatementsInherit: true
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -19,6 +21,7 @@ getCategories:
   handler: src/functions/query/getCategories/getCategories.handler
   environment:
     CATEGORY_TABLE: !Ref CategoryTable
+  iamRoleStatementsInherit: true
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -29,6 +32,7 @@ placeOrder:
   environment:
     ORDER_TABLE: !Ref OrderTable
     PRODUCT_TABLE: !Ref ProductTable
+  iamRoleStatementsInherit: true
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -43,6 +47,7 @@ createProduct:
   environment:
     PRODUCT_TABLE: !Ref ProductTable
     CATEGORY_TABLE: !Ref CategoryTable
+  iamRoleStatementsInherit: true
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -58,6 +63,7 @@ createCategory:
   environment:
     PRODUCT_TABLE: !Ref ProductTable
     CATEGORY_TABLE: !Ref CategoryTable
+  iamRoleStatementsInherit: true
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -72,6 +78,7 @@ startProcessingOrder:
   handler: src/functions/mutation/startProcessingOrder/startProcessingOrder.handler
   environment:
     ORDER_TABLE: !Ref OrderTable
+  iamRoleStatementsInherit: true
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -82,6 +89,7 @@ completeOrder:
   handler: src/functions/mutation/completeOrder/completeOrder.handler
   environment:
     ORDER_TABLE: !Ref OrderTable
+  iamRoleStatementsInherit: true
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -92,6 +100,7 @@ categories:
   handler: src/functions/field/categories/categories.handler
   environment:
     CATEGORY_TABLE: !Ref CategoryTable
+  iamRoleStatementsInherit: true
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -101,6 +110,7 @@ products:
   handler: src/functions/field/products/products.handler
   environment:
     PRODUCT_TABLE: !Ref ProductTable
+  iamRoleStatementsInherit: true
   iamRoleStatements:
     - Effect: Allow
       Action:

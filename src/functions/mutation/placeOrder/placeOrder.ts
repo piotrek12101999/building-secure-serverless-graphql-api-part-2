@@ -15,6 +15,7 @@ import { ProductRepository } from "../../../database/types/ProductRepository";
 import { DynamoProductRepository } from "../../../database/DynamoProductRepository/DynamoProductRepository";
 import { formatPrice } from "../../../utils/formatPrice";
 import { getRequesterEmail } from "../../../utils/getRequesterEmail";
+import { schema } from "./schema";
 
 const orderRepository: OrderRepository = new DynamoOrderRepository();
 const productRepository: ProductRepository = new DynamoProductRepository();
@@ -23,6 +24,12 @@ export const handler: AppSyncResolverHandler<
   MutationPlaceOrderArgs,
   Mutation["placeOrder"]
 > = async (event) => {
+  const { error } = schema.validate(event.arguments.input);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
   const { products: productsInput } = event.arguments.input;
 
   if (productsInput.length === 0) {

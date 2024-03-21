@@ -12,6 +12,7 @@ import { formatPrice } from "../../../utils/formatPrice";
 import { v4 } from "uuid";
 import { CategoryRepository } from "../../../database/types/CategoryRepository";
 import { DynamoCategoryRepository } from "../../../database/DynamoCategoryRepository/DynamoCategoryRepository";
+import { schema } from "./schema";
 
 const productRepository: ProductRepository = new DynamoProductRepository();
 const categoryRepository: CategoryRepository = new DynamoCategoryRepository();
@@ -20,6 +21,12 @@ export const handler: AppSyncResolverHandler<
   MutationCreateProductArgs,
   Mutation["createProduct"] | void
 > = async (event) => {
+  const { error } = schema.validate(event.arguments.input);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
   const id = v4();
   const { categories } = event.arguments.input;
 
